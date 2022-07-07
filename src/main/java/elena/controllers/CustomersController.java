@@ -9,12 +9,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import elena.dao.CustomerDAO;
 import elena.models.Customer;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/customers")
-@Api(value = "Контроллер для иллюстрации")
+@Api(value = "Контроллер записей")
 public class CustomersController {
 
     private final CustomerDAO customerDAO;
@@ -25,25 +26,27 @@ public class CustomersController {
     }
 
     @GetMapping()
-    @ApiOperation("Получение записей")
+    @ApiOperation("Все записи")
     public String index(Model model) {
         model.addAttribute("customers", customerDAO.index());
         return "customers/index";
     }
 
     @GetMapping("/{id}")
+    @ApiOperation("Получение записи по id")
     public String show(@PathVariable("id") int id, Model model) {
         model.addAttribute("customer", customerDAO.show(id));
         return "customers/show";
     }
 
     @GetMapping("/new")
+    @ApiIgnore
     public String newCustomer (@ModelAttribute("customer") Customer customer) {
         return "customers/new";
     }
 
     @PostMapping()
-    @ApiOperation("Создание записи")
+    @ApiOperation("Создание новой записи")
     public String create(@ModelAttribute("customer") @Valid Customer customer,
                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
@@ -54,14 +57,14 @@ public class CustomersController {
     }
 
     @GetMapping("/{id}/edit")
-
+    @ApiIgnore
     public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("customer", customerDAO.show(id));
         return "customers/edit";
     }
 
     @PatchMapping("/{id}")
-    @ApiOperation("Редактирование записей")
+    @ApiOperation("Редактирование записи")
     public String update(@ModelAttribute("customer") @Valid Customer customer, BindingResult bindingResult,
                          @PathVariable("id") int id) {
         if (bindingResult.hasErrors())
@@ -72,7 +75,7 @@ public class CustomersController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation("Удаление записей")
+    @ApiOperation("Удаление записи")
     public String delete(@PathVariable("id") int id) {
         customerDAO.delete(id);
         return "redirect:/customers";
